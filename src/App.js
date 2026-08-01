@@ -10,9 +10,18 @@ export default function App() {
 
   useEffect(() => {
     const tenantId = 1;
-    fetch(`${API_URL}/api/sites?tenant_id=${tenantId}`).then(r => r.json()).then(setSites);
-    fetch(`${API_URL}/api/checkpoints?tenant_id=${tenantId}`).then(r => r.json()).then(setCheckpoints);
-    fetch(`${API_URL}/api/patrol-logs?tenant_id=${tenantId}`).then(r => r.json()).then(setLogs);
+
+    fetch(`${API_URL}/api/sites?tenant_id=${tenantId}`)
+      .then(r => r.json())
+      .then(setSites);
+
+    fetch(`${API_URL}/api/checkpoints?tenant_id=${tenantId}`)
+      .then(r => r.json())
+      .then(setCheckpoints);
+
+    fetch(`${API_URL}/api/patrol-logs?tenant_id=${tenantId}`)
+      .then(r => r.json())
+      .then(setLogs);
   }, []);
 
   return (
@@ -25,12 +34,14 @@ export default function App() {
       <div className="grid">
         <div className="card">
           <h2>Sites</h2>
-          {sites.length === 0 ? <p className="empty">No sites yet</p> : (
+          {sites.length === 0 ? (
+            <p className="empty">No sites yet</p>
+          ) : (
             <ul>
-              {sites.map(s => (
-                <li key={s.id}>
-                  <span className="item-title">{s.name}</span>
-                  <span className="item-sub">{s.address}</span>
+              {sites.map(site => (
+                <li key={site.id}>
+                  <span className="item-title">{site.name}</span>
+                  <span className="item-sub">{site.address}</span>
                 </li>
               ))}
             </ul>
@@ -39,12 +50,14 @@ export default function App() {
 
         <div className="card">
           <h2>Checkpoints</h2>
-          {checkpoints.length === 0 ? <p className="empty">No checkpoints yet</p> : (
+          {checkpoints.length === 0 ? (
+            <p className="empty">No checkpoints yet</p>
+          ) : (
             <ul>
-              {checkpoints.map(c => (
-                <li key={c.id}>
-                  <span className="item-title">{c.name}</span>
-                  <span className="item-sub">QR: {c.qr_code}</span>
+              {checkpoints.map(cp => (
+                <li key={cp.id}>
+                  <span className="item-title">{cp.name}</span>
+                  <span className="item-sub">QR: {cp.qr_code}</span>
                 </li>
               ))}
             </ul>
@@ -53,13 +66,15 @@ export default function App() {
 
         <div className="card">
           <h2>Patrol Logs</h2>
-          {logs.length === 0 ? <p className="empty">No patrol logs yet</p> : (
+          {logs.length === 0 ? (
+            <p className="empty">No patrol logs yet</p>
+          ) : (
             <ul>
-              {logs.map(l => (
-                <li key={l.id}>
-                  <span className="item-title">Checkpoint {l.checkpoint_id}</span>
+              {logs.map(log => (
+                <li key={log.id}>
+                  <span className="item-title">Checkpoint {log.checkpoint_id}</span>
                   <span className="item-sub">
-                    User {l.user_id} · {new Date(l.scanned_at).toLocaleString()}
+                    User {log.user_id} · {new Date(log.scanned_at).toLocaleString()}
                   </span>
                 </li>
               ))}

@@ -1,5 +1,98 @@
-h1,
-p {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f4f6f9;
+  color: #1a1f2b;
+  line-height: 1.5;
+}
+
+.dashboard {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.dashboard-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.badge {
+  background: #4f46e5;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  border: 1px solid #eef0f4;
+}
+
+.card h2 {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f1f5;
+}
+
+.card ul {
+  list-style: none;
+}
+
+.card li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f5f6f8;
+  font-size: 14px;
+}
+
+.card li:last-child {
+  border-bottom: none;
+}
+
+.item-title {
+  font-weight: 600;
+  color: #111827;
+  display: block;
+}
+
+.item-sub {
+  color: #8b93a1;
+  font-size: 13px;
+}
+
+.empty {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 14px;
+  padding: 8px 0;
 }
