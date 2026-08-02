@@ -2,33 +2,92 @@ import React, { useEffect, useState } from "react";
 import "./style.css";
 
 const API_URL = "https://patrolsync-backend.onrender.com";
+const TENANT_ID = 1;
+const CURRENT_USER_ID = 1;
 
 export default function App() {
   const [sites, setSites] = useState([]);
   const [checkpoints, setCheckpoints] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [selectedCheckpoint, setSelectedCheckpoint] = useState("");
+  const [logging, setLogging] = useState(false);
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    const tenantId = 1;
-
-    fetch(`${API_URL}/api/sites?tenant_id=${tenantId}`)
+  const loadAll = () => {
+    fetch(`${API_URL}/api/sites?tenant_id=${TENANT_ID}`)
       .then(r => r.json())
       .then(setSites);
 
-    fetch(`${API_URL}/api/checkpoints?tenant_id=${tenantId}`)
+    fetch(`${API_URL}/api/checkpoints?tenant_id=${TENANT_ID}`)
       .then(r => r.json())
-      .then(setCheckpoints);
+      .then(data => {
+        setCheckpoints(data);
+        if (data.length > 0 && !selectedCheckpoint) {
+          setSelectedCheckpoint(data[0].id);
+        }
+      });
 
-    fetch(`${API_URL}/api/patrol-logs?tenant_id=${tenantId}`)
+    fetch(`${API_URL}/api/patrol-logs?tenant_id=${TENANT_ID}`)
       .then(r => r.json())
       .then(setLogs);
+  };
+
+  useEffect(() => {
+    loadAll();
   }, []);
+
+  const handleLogPatrol = async () => {
+    if (!selectedCheckpoint) return;
+    setLogging(true);
+    setMessage("");
+    try {
+      const res = await fetch(`${API_URL}/api/patrol-logs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_id: TENANT_ID,
+          checkpoint_id: Number(selectedCheckpoint),
+          user_id: CURRENT_USER_ID
+        })
+      });
+      if (!res.ok) throw new Error("Failed to log patrol");
+      setMessage("Patrol logged successfully!");
+      fetch(`${API_URL}/api/patrol-logs?tenant_id=${TENANT_ID}`)
+        .then(r => r.json())
+        .then(setLogs);
+    } catch (err) {
+      setMessage("Error logging patrol: " + err.message);
+    } finally {
+      setLogging(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
 
   return (
     <div className="dashboard">
       <div className="dashboard-header">
         <h1>PatrolSync Dashboard</h1>
         <span className="badge">Tenant #1</span>
+      </div>
+
+      <div className="card log-patrol-card">
+        <h2>Log a Patrol</h2>
+        <div className="log-form">
+          <select
+            value={selectedCheckpoint}
+            onChange={e => setSelectedCheckpoint(e.target.value)}
+          >
+            {checkpoints.map(cp => (
+              <option key={cp.id} value={cp.id}>
+                {cp.name} ({cp.qr_code})
+              </option>
+            ))}
+          </select>
+          <button onClick={handleLogPatrol} disabled={logging || !selectedCheckpoint}>
+            {logging ? "Logging..." : "Log Patrol"}
+          </button>
+        </div>
+        {message && <p className="log-message">{message}</p>}
       </div>
 
       <div className="grid">
