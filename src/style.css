@@ -141,4 +141,47 @@ body {
   font-size: 13px;
   color: #16a34a;
   font-weight: 600;
+}.log-patrol-card {
+  margin-bottom: 24px;
+}
+
+.log-patrol-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.log-patrol-form select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.log-patrol-form button {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.log-patrol-form button:disabled {
+  background: #a5a6f6;
+  cursor: not-allowed;
+}
+
+.log-patrol-form button:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.form-message {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #4f46e5;
 }

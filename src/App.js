@@ -3,51 +3,39 @@ import "./style.css";
 
 const API_URL = "https://patrolsync-backend.onrender.com";
 const TENANT_ID = 1;
+const USER_ID = 1;
 
 export default function App() {
   const [sites, setSites] = useState([]);
   const [checkpoints, setCheckpoints] = useState([]);
-  const [guards, setGuards] = useState([]);
   const [logs, setLogs] = useState([]);
   const [selectedCheckpoint, setSelectedCheckpoint] = useState("");
-  const [selectedGuard, setSelectedGuard] = useState("");
   const [logging, setLogging] = useState(false);
   const [message, setMessage] = useState("");
 
-  const loadAll = () => {
-    fetch(`${API_URL}/api/sites?tenant_id=${TENANT_ID}`)
-      .then(r => r.json())
-      .then(setSites);
-
-    fetch(`${API_URL}/api/checkpoints?tenant_id=${TENANT_ID}`)
-      .then(r => r.json())
-      .then(data => {
-        setCheckpoints(data);
-        if (data.length > 0 && !selectedCheckpoint) {
-          setSelectedCheckpoint(data[0].id);
-        }
-      });
-
-    fetch(`${API_URL}/api/users?tenant_id=${TENANT_ID}&role=guard`)
-      .then(r => r.json())
-      .then(data => {
-        setGuards(data);
-        if (data.length > 0 && !selectedGuard) {
-          setSelectedGuard(data[0].id);
-        }
-      });
-
+  const loadLogs = () => {
     fetch(`${API_URL}/api/patrol-logs?tenant_id=${TENANT_ID}`)
       .then(r => r.json())
       .then(setLogs);
   };
 
   useEffect(() => {
-    loadAll();
+    fetch(`${API_URL}/api/sites?tenant_id=${TENANT_ID}`)
+      .then(r => r.json())
+      .then(setSites);
+
+    fetch(`${API_URL}/api/checkpoints?tenant_id=${TENANT_ID}`)
+      .then(r => r.json())
+      .then(setCheckpoints);
+
+    loadLogs();
   }, []);
 
   const handleLogPatrol = async () => {
-    if (!selectedCheckpoint || !selectedGuard) return;
+    if (!selectedCheckpoint) {
+      setMessage("Please select a checkpoint first.");
+      return;
+    }
     setLogging(true);
     setMessage("");
     try {
@@ -56,26 +44,18 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenant_id: TENANT_ID,
-          checkpoint_id: Number(selectedCheckpoint),
-          user_id: Number(selectedGuard)
+          checkpoint_id: parseInt(selectedCheckpoint),
+          user_id: USER_ID
         })
       });
       if (!res.ok) throw new Error("Failed to log patrol");
       setMessage("Patrol logged successfully!");
-      fetch(`${API_URL}/api/patrol-logs?tenant_id=${TENANT_ID}`)
-        .then(r => r.json())
-        .then(setLogs);
+      loadLogs();
     } catch (err) {
       setMessage("Error logging patrol: " + err.message);
     } finally {
       setLogging(false);
-      setTimeout(() => setMessage(""), 3000);
     }
-  };
-
-  const guardLabel = (userId) => {
-    const guard = guards.find(g => g.id === userId);
-    return guard ? guard.email : `User ${userId}`;
   };
 
   return (
@@ -87,39 +67,21 @@ export default function App() {
 
       <div className="card log-patrol-card">
         <h2>Log a Patrol</h2>
-        <div className="log-form">
+        <div className="log-patrol-form">
           <select
             value={selectedCheckpoint}
             onChange={e => setSelectedCheckpoint(e.target.value)}
           >
+            <option value="">Select a checkpoint...</option>
             {checkpoints.map(cp => (
-              <option key={cp.id} value={cp.id}>
-                {cp.name} ({cp.qr_code})
-              </option>
+              <option key={cp.id} value={cp.id}>{cp.name}</option>
             ))}
           </select>
-          <select
-            value={selectedGuard}
-            onChange={e => setSelectedGuard(e.target.value)}
-          >
-            {guards.length === 0 ? (
-              <option value="">No guards available</option>
-            ) : (
-              guards.map(g => (
-                <option key={g.id} value={g.id}>
-                  {g.email}
-                </option>
-              ))
-            )}
-          </select>
-          <button
-            onClick={handleLogPatrol}
-            disabled={logging || !selectedCheckpoint || !selectedGuard}
-          >
+          <button onClick={handleLogPatrol} disabled={logging}>
             {logging ? "Logging..." : "Log Patrol"}
           </button>
         </div>
-        {message && <p className="log-message">{message}</p>}
+        {message && <p className="form-message">{message}</p>}
       </div>
 
       <div className="grid">
@@ -165,7 +127,7 @@ export default function App() {
                 <li key={log.id}>
                   <span className="item-title">Checkpoint {log.checkpoint_id}</span>
                   <span className="item-sub">
-                    {guardLabel(log.user_id)} · {new Date(log.scanned_at).toLocaleString()}
+                    User {log.user_id} · {new Date(log.scanned_at).toLocaleString()}
                   </span>
                 </li>
               ))}
